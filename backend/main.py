@@ -11,7 +11,7 @@ async def lifespan(app: FastAPI):
     yield
     print('Закрытие программы')
 
-app = FastAPI(title='Salesman', lifespan=lifespan)
+app = FastAPI(title='Salesman', lifespan=lifespan, version='0.0.1')
 app.include_router(userrout)
 app.include_router(airout)
 app.include_router(stockrout)
