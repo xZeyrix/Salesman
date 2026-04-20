@@ -1,12 +1,11 @@
-function switchPage(name, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  el.classList.add('active');
-  window.scrollTo(0, 0);
-}
+(function () {
+  const page = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-item').forEach(function (el) {
+    if (el.getAttribute('href') === page) el.classList.add('active');
+  });
+})();
 
-const aiReplies = {
+var aiReplies = {
   'Стоит ли докупить NVDA?':
     'NVIDIA показывает сильные фундаментальные показатели. Спрос на GPU для ИИ остаётся высоким. Текущий P/E 45x — выше среднего, но рост выручки +122% г/г оправдывает оценку. Можно рассмотреть при откатах к $840.',
   'Какие риски в моём портфеле?':
@@ -18,15 +17,16 @@ const aiReplies = {
 };
 
 function addMessage(text) {
-  const area = document.getElementById('chat-messages');
+  var area = document.getElementById('chat-messages');
+  if (!area) return;
 
-  const userBubble = document.createElement('div');
+  var userBubble = document.createElement('div');
   userBubble.className = 'chat-bubble bubble-user';
   userBubble.textContent = text;
   area.appendChild(userBubble);
 
-  setTimeout(() => {
-    const aiBubble = document.createElement('div');
+  setTimeout(function () {
+    var aiBubble = document.createElement('div');
     aiBubble.className = 'chat-bubble bubble-ai';
     aiBubble.textContent =
       aiReplies[text] ||
@@ -37,15 +37,33 @@ function addMessage(text) {
 }
 
 function sendMessage() {
-  const input = document.getElementById('chat-input');
-  const text = input.value.trim();
+  var input = document.getElementById('chat-input');
+  if (!input) return;
+  var text = input.value.trim();
   if (!text) return;
   input.value = '';
   addMessage(text);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('chat-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') sendMessage();
-  });
+document.addEventListener('DOMContentLoaded', function () {
+  var chatInput = document.getElementById('chat-input');
+  if (chatInput) {
+    chatInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') sendMessage();
+    });
+  }
+
+  var loginBtn = document.getElementById('login-btn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', function () {
+      window.location.href = 'index.html';
+    });
+  }
+
+  var registerBtn = document.getElementById('register-btn');
+  if (registerBtn) {
+    registerBtn.addEventListener('click', function () {
+      window.location.href = 'login.html';
+    });
+  }
 });
