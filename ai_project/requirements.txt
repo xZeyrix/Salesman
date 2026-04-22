@@ -1,0 +1,6 @@
+httpx==0.28.1
+pytest==9.0.3
+pydantic==2.12.5
+pydantic-settings==2.14.0
+mypy==1.20.1
+aiogram==3.27.0
