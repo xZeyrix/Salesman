@@ -11,28 +11,9 @@ router = APIRouter(prefix='/user', tags=['Пользователь'])
 async def get_wallet(user: CurrentUserDep) -> dict[str, str | None]:
     return {'wallet_key': user.wallet_key}
 
-@router.patch(
-        '/update', 
-        responses={
-            200: {
-                "description": "Успешное обновление",
-                "content": {
-                    "application/json": {
-                        "example": {"status": "success", "wallet_key": "0x123..."}
-                    }
-                },
-            },
-            404: {
-                "description": "Пользователь не найден",
-                "content": {
-                    "application/json": {
-                        "example": {"detail": "User not found"}
-                    }
-                },
-            },
-        })
+@router.patch('/update')
 async def user_update(user: CurrentUserDep, 
-                      update_data: Annotated[UserUpdate, Body(examples=[{'wallet_key': 'sahgvstqujq1781wj6h2'}])],
+                      update_data: Annotated[UserUpdate, Body(examples=[{'wallet_key': 'newapikeyfreedom'}])],
                       dbsession: DBSessionDep
                       ) -> dict[str, str]:
     
@@ -41,4 +22,3 @@ async def user_update(user: CurrentUserDep,
         setattr(user, key, value)
     await dbsession.commit()
     return {'status': 'success', 'wallet_key': user.wallet_key}
-    

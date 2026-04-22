@@ -1,15 +1,16 @@
 from typing import Annotated
 
 from fastapi import HTTPException, Header, Depends
-from sqlalchemy import select
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.core.database import get_session
+from backend.core.database import DBSessionDep
 from backend.models.model import User
+from models.model import Message
 
 
 async def get_current_user(
+    session: DBSessionDep,
     telegram_id: int | None = Header(default=None, alias="Telegram-Id"),
-    session: AsyncSession = Depends(get_session),
     ) -> User:
     
     if not telegram_id:
@@ -21,7 +22,6 @@ async def get_current_user(
     user = result.scalar_one_or_none()
 
     if not user:
-        # Авторегистрация нового пользователя"
         user = User(telegram_id=telegram_id)
         session.add(user)
         await session.commit()
@@ -30,3 +30,21 @@ async def get_current_user(
     return user
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
+
+async def last_abr_history(user: CurrentUserDep,
+                           session: DBSessionDep,
+                           n: int =1) -> str | None | list[str]:
+    result = await session.execute(
+        select(Message.abr_history)
+        .where(Message.abr_history != None, Message.user_id == user.id)
+        .order_by(desc(Message.created_at))
+        .limit(n)
+    )
+    abr_history = result.scalars().all()
+    if not abr_history:
+        return None
+    return abr_history[0] if n == 1 else abr_history
+
+
+
+ABRhistoryDep = Annotated[str | None | list[str], Depends(last_abr_history)]
