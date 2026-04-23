@@ -1,0 +1,8 @@
+{
+  "payload": {
+    "content_type": "document",
+    "file_id": "doc123",
+    "text": "hi"
+  },
+  "value": "текст документа"
+}

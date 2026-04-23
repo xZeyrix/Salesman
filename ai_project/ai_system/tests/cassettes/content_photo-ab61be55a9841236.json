@@ -1,0 +1,8 @@
+{
+  "payload": {
+    "content_type": "photo",
+    "file_id": "file123",
+    "text": "hi"
+  },
+  "value": "Описание фото: None, Запрос пользователя: hi"
+}
