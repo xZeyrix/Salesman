@@ -39,21 +39,23 @@ async def send_message(user: CurrentUserDep,
                 text = message.text,
         )
         dbsession.add(user_msg)
+        await dbsession.flush()
         airesponse = await ai.handle({"user_id": user.telegram_id,
                                  "history": abr_history,
                                  "text": message.text, 
                                  "file_id": None, 
                                  "content_type": "text"})
+        if not airesponse.status == "OK":
+            raise HTTPException(status_code=500, detail=f"Ошибка от ИИ {airesponse.status}")
         ai_msg = Message(
             user_id = user.id,
             role = Role.AI,
             mode = Mode.DEFAULT,
             abr_history = airesponse.content.history,
-            text= airesponse.content.response if airesponse.status == "OK" else airesponse.status
+            text= airesponse.content.response 
         )
 
         dbsession.add(ai_msg)
-        dbsession.add()
         await dbsession.commit()
         await dbsession.refresh(ai_msg) 
         return ai_msg
