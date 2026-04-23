@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Body, HTTPException, Path, Query
 from backend.api.deps import CurrentUserDep,  ABRhistoryDep
 from backend.core.database import DBSessionDep
-from schemas.chat import MessageRequest, MessageResponse, Role, Mode
-from models.model import Message
+from backend.schemas.chat import MessageRequest, MessageResponse, Role, Mode
+from backend.models.model import Message
 from sqlalchemy import desc, select
 
 logger = logging.getLogger(__name__)

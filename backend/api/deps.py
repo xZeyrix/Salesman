@@ -5,7 +5,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.database import DBSessionDep
 from backend.models.model import User
-from models.model import Message
+from backend.models.model import Message
 
 
 async def get_current_user(

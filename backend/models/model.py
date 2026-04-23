@@ -1,10 +1,9 @@
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import BigInteger, String, ForeignKey, func, Column, Integer,, Text, DateTime
+from sqlalchemy import BigInteger, Boolean, String, ForeignKey, func, Column, Integer, Text, DateTime
 from typing import Optional
 from backend.models.base import Base
 from enum import Enum
-from sqlalchemy import 
 
 class User(Base):
     __tablename__ = "users"
@@ -25,11 +24,12 @@ class Message(Base):
     replied: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
-class StockNews(Base):
-    __tablename__ = "stock_news"
+class News(Base):
+    __tablename__ = "news"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True) 
-    ticker: Mapped[str] = mapped_column(String(10), index=True)
+    finhub_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
+    ticker: Mapped[str] = mapped_column(String(10), index=True, nullable=True)
     category: Mapped[Optional[str]] = mapped_column(String(50))
     headline: Mapped[str] = mapped_column(String(500))
     image: Mapped[Optional[str]] = mapped_column(String(500))

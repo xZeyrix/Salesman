@@ -3,7 +3,7 @@ from fastapi import Depends
 from backend.core.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from backend.models.base import Base
-from backend.models.model import User
+from backend.models.model import User, News, Message
 
 
 engine = create_async_engine(str(settings.DB_URL),
