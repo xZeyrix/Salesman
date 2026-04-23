@@ -22,4 +22,5 @@ class Message(Base):
     mode: Mapped[str] = mapped_column(String(30), server_default="default")
     text: Mapped[str] = mapped_column(String(1000))
     abr_history: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    replied: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
