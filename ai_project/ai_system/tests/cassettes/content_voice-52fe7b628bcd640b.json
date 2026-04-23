@@ -1,0 +1,8 @@
+{
+  "payload": {
+    "content_type": "voice",
+    "file_id": "file123",
+    "text": "hi"
+  },
+  "value": "распознанный текст"
+}

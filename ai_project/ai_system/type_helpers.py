@@ -1,27 +1,23 @@
 from pydantic.dataclasses import dataclass
-from typing import Optional, Literal
+from pydantic import BaseModel
+from typing import Optional
 
-@dataclass
-class ContentStructure:
-    id: int
+class ContentStructure(BaseModel):
+    user_id: int
     history: Optional[str]
     response: str
 
-
-@dataclass
-class CoreResponse:
+class CoreResponse(BaseModel):
     history: Optional[str]
     response: str
 
-@dataclass
-class SalesmanResponse:
+class SalesmanResponse(BaseModel):
     status: str
     content: Optional[ContentStructure]
 
-@dataclass
-class IncMsgStructure:
+class IncMsgStructure(BaseModel):
     user_id: int
-    history: Optional[str]
-    text: Optional[str]
-    file_id: Optional[str]
-    content_type: Literal["text", "voice", "photo", "document"]
+    history: Optional[str] = None
+    text: Optional[str] = None
+    file_id: Optional[str] = None
+    content_type: str
