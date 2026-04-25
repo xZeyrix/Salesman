@@ -8,5 +8,6 @@ class Settings(BaseSettings):
 
     bot_token: str
     groq_token: str
+    finnhub_token: str
 
 settings = Settings() # type:ignore
