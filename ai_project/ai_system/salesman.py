@@ -1,10 +1,10 @@
 from aiogram.types import Message, Voice, PhotoSize, Document
 from typing import Optional, Union, Literal
-from ai_system.type_helpers import CoreResponse, SalesmanResponse, ContentStructure, IncMsgStructure
-from ai_system.converters.document_to_text import convert as doc_to_text
-from ai_system.converters.photo_to_text import convert as ph_to_text
-from ai_system.converters.voice_to_text import convert as vc_to_text
-from ai_system.converters.text_to_text import convert as text_to_text
+from .type_helpers import CoreResponse, SalesmanResponse, ContentStructure, IncMsgStructure
+from .converters.document_to_text import convert as doc_to_text
+from .converters.photo_to_text import convert as ph_to_text
+from .converters.voice_to_text import convert as vc_to_text
+from .converters.text_to_text import convert as text_to_text
 import re
 import inspect
 from pydantic import ValidationError
@@ -16,12 +16,13 @@ class NormalizeMsgStructure:
         
         if isinstance(object, Message):
             text = object.text or object.caption or None
-            if object.voice:
-                file_id = object.voice.file_id
-            elif object.photo:
-                file_id = object.photo[-1].file_id
-            elif object.document:
-                file_id = object.document.file_id
+            file_ids = {
+                "voice": object.voice.file_id,
+                "photo": object.photo[-1].file_id,
+                "document": object.document.file_id,
+            }
+            if object.content_type in file_ids:
+                file_id = file_ids[object.content_type]
             else:
                 file_id = None
 
