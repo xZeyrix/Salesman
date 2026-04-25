@@ -1,0 +1,15 @@
+{
+  "payload": {
+    "user_id": 1,
+    "content_type": "text",
+    "text": "hello"
+  },
+  "value": {
+    "status": "OK",
+    "content": {
+      "user_id": 1,
+      "history": null,
+      "response": "hello"
+    }
+  }
+}
