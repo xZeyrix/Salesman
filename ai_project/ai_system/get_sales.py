@@ -1,27 +1,31 @@
-# Finnhub, Alpha Vantage, Financial Modeling Prep (FMP), Alpaca Markets (Data API), yfinance (Python-библиотека, не полноценный API), StockData.org, Polygon.io (5RPM), Marketstack (100RPM)
-
-from config import settings
+from .config import settings
 import finnhub
-import time
+import asyncio
 
-# Вставь сюда свой API-ключ (получи бесплатно на https://finnhub.io/register)
-API_KEY = settings.finnhub_token
+finnhub_client = finnhub.Client(api_key=settings.finnhub_token)
 
-# Создаём клиент
-client = finnhub.Client(api_key=API_KEY)
+async def get_symbol(name: str) -> str | None:
+    response = await asyncio.to_thread(finnhub_client.symbol_lookup, name)
+    if response.get("result"):
+        symbol = response["result"][0]["symbol"]
+        return symbol
+    else:
+        return None
 
-# # Получаем котировку акции (quote)
-# symbol = "TSLA"          # Можно менять: TSLA, MSFT, NVDA, SBER.ME и т.д.
-# quote = client.quote(symbol)
+async def get_quote(name: str) -> dict | None:
+    try:
+        response = await asyncio.to_thread(finnhub_client.quote, name)
+    except finnhub.exceptions.FinnhubAPIException:
+        return None
+    if (response.get("c") == 0 and response.get("h") == 0 and response.get("l") == 0) or (response.get("o") == 0 and response.get("t") == 0 and response.get("d") == None and response.get("dp") == None):
+        return None
+    return response
 
-# print(f"Данные по {symbol}:")
-# print(f"Текущая цена (c)     : {quote['c']}")
-# print(f"Изменение (d)       : {quote['d']}")
-# print(f"Процент изменения (dp): {quote['dp']}%")
-# print(f"Открытие (o)        : {quote['o']}")
-# print(f"Максимум (h)        : {quote['h']}")
-# print(f"Минимум (l)         : {quote['l']}")
-# print(f"Предыдущее закрытие (pc): {quote['pc']}")
+async def get_recommendations(name: str) -> dict | None:
+    try:
+        return await asyncio.to_thread(finnhub_client.recommendation_trends, name)
+    except finnhub.exceptions.FinnhubAPIException:
+        return None
 
-response = client.company_news('MSFT', _from="2026-04-24", to="2026-04-24")
+response = asyncio.run(get_recommendations("GOLD"))
 print(response)
