@@ -1,6 +1,6 @@
 from aiogram.types import Message, Voice, PhotoSize, Document
 from typing import Optional, Union, Literal
-from .type_helpers import CoreResponse, SalesmanResponse, ContentStructure, IncMsgStructure, RouterResponse, ReduceHistoryResponse
+from .type_helpers import CoreResponse, SalesmanResponse, ContentStructure, IncMsgStructure, RouterResponse, ReduceHistoryResponse, PromptInjectionError
 from .converters.document_to_text import convert as doc_to_text
 from .converters.photo_to_text import convert as ph_to_text
 from .converters.voice_to_text import convert as vc_to_text
@@ -10,6 +10,8 @@ import inspect
 from pydantic import ValidationError
 from .groq_functions import PromptGuard, AiRouter, AiSalesman, ReduceHistory
 from .config import prompts
+from .get_sales import get_symbol, get_calendar, get_company_news, get_company_profile, get_quote, get_recommendations, get_surprise
+from datetime import date, timedelta
 
 class NormalizeMsgStructure:
     def normalize(self, object: Union[Message, IncMsgStructure, dict]) -> IncMsgStructure:
@@ -67,6 +69,24 @@ class TextNormalizer:
         return re.sub(r"[^a-zA-Zа-яА-ЯёЁ.,:\-()1234567890?!_ ]", "", text).strip()
 
 class BotCore:
+    def __init__(self):
+        self.get_sales = {
+            "quote": get_quote,
+            "recommendations": get_recommendations,
+            "surprise": get_surprise,
+            "calendar": get_calendar,
+            "company_news": get_company_news,
+            "company_profile": get_company_profile,
+            "other": None,
+        }
+        self.general = {
+            "info": None,
+            "other": None,
+        }
+        self.main_types = {
+            "get_sales": self.get_sales,
+            "general": self.general,
+        }
     async def _is_prompt_injection(self, user_message: str, sensetivity: float | None = None) -> bool:
         guard = PromptGuard(user_message, sensetivity)
         response = await guard.is_injection()
@@ -83,12 +103,40 @@ class BotCore:
         reduce_history = ReduceHistory(user_message, history)
         response = await reduce_history.compress(ai_message, prompt)
         return response
+    async def _get_data(self, router_response: RouterResponse) -> str:
+        types = router_response.type
+        subtypes = router_response.subtype
+        name = router_response.name if router_response.name else "null"
+        name = name.replace("google", "alphabet")
+
+        func = self.main_types.get(types, {}).get(subtypes)
+
+        if callable(func):
+            return await func(
+                name,
+                (date.today() - timedelta(days=90)).strftime("%Y-%m-%d"),
+                date.today().strftime("%Y-%m-%d")
+            )
+        else:
+            return None
     async def respond(self, user_message: str, history: str | None = None) -> CoreResponse:
-        await self._is_prompt_injection(user_message)
-        await self._get_route(user_message, prompts.router, history)
-        await self._get_response(user_message, prompts.salesman, history)
-        await self._reduce_history(user_message, history, "Принято.", prompts.history)
-        return CoreResponse(history=history, response=user_message)
+        if await self._is_prompt_injection(user_message):
+            raise PromptInjectionError("A prompt injection has been detected.")
+        
+        router_response = await self._get_route(user_message, prompts.router, history)
+        # print(router_response)
+        data = await self._get_data(router_response)
+        # print(data)
+
+        salesman_response = await self._get_response(user_message, prompts.salesman, history, data)
+
+        history_json = await self._reduce_history(user_message, history, salesman_response, prompts.history)
+        if history_json.status == "OK":
+            reduced_history = history_json.history
+        else:
+            reduced_history = ""
+
+        return CoreResponse(history=reduced_history, response=salesman_response)
 
 class Salesman:
     def __init__(self):
@@ -108,5 +156,7 @@ class Salesman:
             text = response.response
             history = response.history
             return SalesmanResponse(status="OK", content=ContentStructure(user_id=id, history=history, response=text))
+        except PromptInjectionError as e:
+            return SalesmanResponse(status=f"INJECTION: {e}", content=None)
         except Exception as e:
             return SalesmanResponse(status=f"ERROR: {e}", content=None)

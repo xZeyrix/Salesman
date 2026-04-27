@@ -30,3 +30,6 @@ class RouterResponse(BaseModel):
 class ReduceHistoryResponse(BaseModel):
     status: Literal["OK", "ERROR"]
     history: str | None
+
+class PromptInjectionError(Exception):
+    pass
