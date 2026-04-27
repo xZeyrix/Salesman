@@ -4,9 +4,9 @@ from aiogram.enums import ParseMode
 from aiogram.filters import Command
 import logging
 import sys
-from config import settings
+from .ai_system.config import settings
 import asyncio
-from router import router
+from .router import router
 
 dp = Dispatcher()
 
