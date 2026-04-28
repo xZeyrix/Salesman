@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from enum import Enum
 from typing import Optional
 
-class Wallet_SRC(Enum, str):
+class Wallet_SRC(str, Enum):
     ALPACA = 'ALPACA'
     TRADERNET = 'TRADERNET'
 

@@ -9,7 +9,7 @@ from backend.api.routers.stocks import router as stockrout
 from backend.api.routers.wallet import router as walletrout
 from backend.core.database import db_begin
 from backend.core.logger import setup_logging
-from backend.services.alpaca_news import start_worker 
+# from backend.services.alpaca_news import start_worker 
 
 import logging
 
@@ -20,9 +20,9 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     logger.info("Запуск программы")
     await db_begin()
-    worker_task = asyncio.create_task(start_worker())
+    # worker_task = asyncio.create_task(start_worker())
     yield
-    worker_task.cancel()
+    # worker_task.cancel()
     logger.info("Закрытие программы")
 
 
@@ -33,7 +33,7 @@ app.add_middleware(
     allow_origins=[
         "http://127.0.0.1:5500",
         "http://localhost:5500",
-        "https://salesman-frontend.vercel.app/"
+        "https://salesman-frontend.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],

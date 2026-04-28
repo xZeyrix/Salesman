@@ -1,6 +1,4 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 from backend.schemas.user import UserUpdate
 from backend.api.deps import CurrentUserDep
 from backend.core.database import DBSessionDep

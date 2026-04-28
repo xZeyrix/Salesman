@@ -106,6 +106,7 @@ class AlpacaNewsCollector:
                     break
 
         return all_articles
+    
     async def _save_batch(self, articles: list[dict], ticker: str | None = None):
         if not articles:
             return
@@ -153,28 +154,35 @@ class AlpacaNewsCollector:
                             summary=article.get("summary"),
                             source=article.get("source"),
                             url=article.get("url"),
-                            image=image_url,          # Передаем уже готовую переменную
-                            related=related[:200] if related else None,
-                            datetime_unix=datetime_unix,
+                            image=image_url,
+                            related_symbols=related[:200] if related else None,
+                            published_at=dt,
                         )
                         .on_conflict_do_update(
                             index_elements=["alpaca_id"],
                             set_={
                                 "ticker": article_ticker,
-                                "related": related[:200] if related else None,
+                                "related_symbols": related[:200] if related else None,
                                 "image": image_url,
                                 "summary": article.get("summary")
                             },
                         )
                     )
+                    
                     await session.execute(stmt)
                     saved += 1
+
+                    if saved % 10 == 0:
+                        await session.commit()
+                        await asyncio.sleep(0.01) 
 
                 await session.commit()
                 logger.info(f"Сохранено {saved} новостей.")
             except Exception as e:
                 logger.error(f"Ошибка записи в БД: {e}")
                 await session.rollback()
+            finally:
+                await session.close()
 
     async def run_cycle(self):
         """Один полный цикл сбора: по тикерам + общие."""
@@ -212,5 +220,5 @@ async def start_worker():
         except Exception as e:
             logger.error(f"Ошибка в цикле воркера: {e}")
 
-        logger.info("Цикл завершён. Спим 300 сек (5 мин).")
-        await asyncio.sleep(300)
+        logger.info("Цикл завершён. Спим 180 сек (3 мин).")
+        await asyncio.sleep(180)
