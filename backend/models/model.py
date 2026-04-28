@@ -3,12 +3,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import BigInteger, Boolean, String, ForeignKey, func, Column, Integer, Text, DateTime, Enum
 from typing import Optional
 from backend.models.base import Base
-from enum import Enum
 
-class WallerSRC(Enum, str):
-    ALPACA = 'ALPACA'
-    TRADERNET = 'TRADERNET'
-    
+
 class User(Base):
     __tablename__ = "users"
 
@@ -28,14 +24,23 @@ class Message(Base):
     replied: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     
-class Wallet():
+class Wallet(Base):
     __tablename__ = "wallets"
     
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
-    wallet_src: Mapped[WalletSRC] = mapped_column(Enum(WalletSRC))
-    wallet_key: Mapped[str] = mapped_column(String(150))
-    wallet_secret: Mapped[str] = mapped_column(String(150))
+    wallet_src: Mapped[str] = mapped_column(String(20))
+    wallet_key: Mapped[str] = mapped_column(String(255))
+    wallet_secret: Mapped[str] = mapped_column(String(255))
+    _wallet_secret: Mapped[str] = mapped_column("wallet_secret", String(255))
+    @property
+    def wallet_secret(self) -> str:
+        decrypted_text = cipher_suite.decrypt(self._wallet_secret.encode())
+        return decrypted_text.decode()
+    @wallet_secret.setter
+    def wallet_secret(self, value: str):
+        encrypted_text = cipher_suite.encrypt(value.encode())
+        self._wallet_secret = encrypted_text.decode()
     
 class News(Base):
     __tablename__ = "news"
