@@ -20,10 +20,3 @@ class WalletRead(BaseModel):
     wallet_SRC: Wallet_SRC
     wallet_key: str =  Field(max_lenght=150, min_lenght=2)
     wallet_secret: str =  Field(max_lenght=150, min_lenght=2)
-    @property
-    def wallet_secret(self):
-        return your_decrypt_function(self._wallet_secret)
-
-    @wallet_secret.setter
-    def wallet_secret(self, value):
-        self._wallet_secret = your_encrypt_function(value)
