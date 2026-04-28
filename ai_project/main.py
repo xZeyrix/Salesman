@@ -7,12 +7,11 @@ import sys
 from backend.core.config import settings
 import asyncio
 from .router import router
-logger = logging.getLogger(__name__)
 dp = Dispatcher()
 
 async def main() -> None:
     bot = Bot(token=settings.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     dp.include_router(router)
 
     await dp.start_polling(bot)
