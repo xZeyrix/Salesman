@@ -1,10 +1,14 @@
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import BigInteger, Boolean, String, ForeignKey, func, Column, Integer, Text, DateTime
+from sqlalchemy import BigInteger, Boolean, String, ForeignKey, func, Column, Integer, Text, DateTime, Enum
 from typing import Optional
 from backend.models.base import Base
 from enum import Enum
 
+class WallerSRC(Enum, str):
+    ALPACA = 'ALPACA'
+    TRADERNET = 'TRADERNET'
+    
 class User(Base):
     __tablename__ = "users"
 
@@ -23,7 +27,16 @@ class Message(Base):
     abr_history: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
     replied: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-
+    
+class Wallet():
+    __tablename__ = "wallets"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    wallet_src: Mapped[WalletSRC] = mapped_column(Enum(WalletSRC))
+    wallet_key: Mapped[str] = mapped_column(String(150))
+    wallet_secret: Mapped[str] = mapped_column(String(150))
+    
 class News(Base):
     __tablename__ = "news"
 
