@@ -1,16 +1,17 @@
 import logging
 from typing import Annotated
 from fastapi import APIRouter, Body, HTTPException, Path, Query
+from ai_project.ai_system.type_helpers import IncMsgStructure
 from backend.api.deps import CurrentUserDep,  ABRhistoryDep
 from backend.core.database import DBSessionDep
 from backend.schemas.chat import MessageRequest, MessageResponse, Role, Mode
 from backend.models.model import Message
 from sqlalchemy import desc, select
-
+from ai_project.ai_system.salesman import Salesman
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix='/ai', tags=['ИИ и чат'])
-ai = {}
+ai = Salesman()
 @router.get('/chat/history', response_model=list[MessageResponse], description='сообщении от старых к новым')
 async def get_chat_history(user: CurrentUserDep,
                            dbsession: DBSessionDep,
@@ -38,11 +39,10 @@ async def send_message(user: CurrentUserDep,
                 abr_history = None,
                 text = message.text,
         )
-        airesponse = await ai.handle({"user_id": user.telegram_id,
-                                 "history": abr_history,
-                                 "text": message.text, 
-                                 "file_id": None, 
-                                 "content_type": "text"})
+        airesponse = await ai.handle(IncMsgStructure(user_id=user.telegram_id,
+                                                     history=abr_history, 
+                                                     text=message.text,
+                                                     content_type="text"))
         if not airesponse.status == "OK":
             dbsession.add(user_msg)
             await dbsession.commit()

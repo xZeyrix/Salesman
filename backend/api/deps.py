@@ -33,17 +33,17 @@ CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 async def last_abr_history(user: CurrentUserDep,
                            session: DBSessionDep,
-                           n: int =1) -> str | None | list[str]:
+                           n_abr_history: int =1) -> str | None | list[str]:
     result = await session.execute(
         select(Message.abr_history)
         .where(Message.abr_history != None, Message.user_id == user.id)
         .order_by(desc(Message.created_at))
-        .limit(n)
+        .limit(n_abr_history)
     )
     abr_history = result.scalars().all()
     if not abr_history:
         return None
-    return abr_history[0] if n == 1 else abr_history
+    return abr_history[0] if n_abr_history == 1 else abr_history
 
 
 
