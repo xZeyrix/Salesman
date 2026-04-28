@@ -1,25 +1,30 @@
-from fastapi import APIRouter, Body
+import logging
+
+from fastapi import APIRouter, Body, HTTPException, Query
+from sqlalchemy import select
 from backend.schemas.wallet import WalletCreate, WalletUpdate, WalletRead
 from backend.api.deps import CurrentUserDep
+from backend.models.model import Wallet
 from backend.core.database import DBSessionDep
 from typing import Annotated
+from backend.services.alpaca import alpaca
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/wallet', tags=['Кошелек'])
-ALPACA_DATA_BASE = "https://data.alpaca.markets/v2"
 
-def _wallet_keys(wallet) -> tuple[str, str]:
+def correct_wallet_keys(wallet: Wallet) -> tuple[str, str]:
     if wallet.wallet_src:
         if not wallet.wallet_key:
             raise HTTPException(
                 status_code=400,
                 detail="Кошелёк Alpaca не привязан. "
-                    "Добавьте API-ключ через PATCH /user/update (поле wallet_key).",
+                    "Добавьте API-ключ через PATCH /wallet/update.",
             )
-        if not wallet.wallet_secret:
+        if not wallet._wallet_secret:
             raise HTTPException(
                 status_code=400,
-                detail="Необходим заголовок X-Wallet-Secret с секретным ключом Alpaca.",
+                detail="Необходим секретный ключ Alpaca.",
             )
-        return user.wallet_key, secret
+        return wallet.wallet_key, wallet._wallet_secret
 
 
 def _alpaca_error(result) -> HTTPException:
@@ -32,23 +37,84 @@ def _alpaca_error(result) -> HTTPException:
 async def wallet_create(data: Annotated[WalletCreate, Body()],
                         user: CurrentUserDep,
                         session: DBSessionDep) -> WalletRead:
-    
+    try:
+        wallet = Wallet(user_id = user.id,
+                        **data.model_dump())
+        session.add(wallet)
+        await session.commit()
+        return wallet
+    except Exception as e:
+        await session.rollback()
+        logger.error(f'create error: {e}')
+        raise HTTPException(status_code=500, detail=f'не удалось сохранить данные')
+
 @router.get('/read')
-async def wallet_read() -> WalletRead:
-    pass
+async def wallet_read(session: DBSessionDep,
+                      user: CurrentUserDep) -> WalletRead:
+    try:
+        result = await session.execute(
+            select(Wallet).where(Wallet.user_id == user.id)
+        )
+        wallet = result.scalar_one_or_none()
+        if not wallet:
+            raise HTTPException(status_code=404, detail='Кошелек не найден')
+        return wallet
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f'read error: {e}')
+        raise HTTPException(status_code=500, detail=f'не удалось получить данные')
+    
 @router.patch('/update')
 async def wallet_update(data: Annotated[WalletUpdate, Body()],
                         user: CurrentUserDep,
                         session: DBSessionDep) -> WalletRead:
-    pass
+    try:
+        result = await session.execute(
+            select(Wallet).where(Wallet.user_id == user.id)
+        )
+        wallet = result.scalar_one_or_none()
+        
+        if not wallet:
+            raise HTTPException(status_code=404, detail='Кошелек не найден')
+
+        update_data = data.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(wallet, key, value)
+
+        await session.commit()
+        await session.refresh(wallet)
+        return wallet
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        await session.rollback()
+        logger.error(f"update error: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка при обновлении данных")
+    
 @router.delete('/delete')
-async def wallet_read():
-    pass
+async def wallet_delete(user: CurrentUserDep,
+                        session: DBSessionDep):
+    try:
+        result = await session.execute(
+            select(Wallet).where(Wallet.user_id == user.id)
+        )
+        wallet = result.scalar_one_or_none()
 
+        if not wallet:
+            raise HTTPException(status_code=404, detail='Кошелек не найден')
+        await session.delete(wallet)
+        await session.commit()
+        
+        return {"detail": "Кошелек успешно удален"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        await session.rollback()
+        logger.error(f"Delete error: {e}")
+        raise HTTPException(status_code=500, detail="Не удалось удалить кошелек")
 
-# ──────────────────────────────────────────────
-# Кошелёк Alpaca
-# ──────────────────────────────────────────────
 
 @router.get("/account", summary="Баланс счёта Alpaca")
 async def get_wallet_account(
@@ -59,7 +125,7 @@ async def get_wallet_account(
     wallet_key добавляется через PATCH /user/update.
     Секрет: заголовок X-Wallet-Secret.
     """
-    api_key, secret_key = _wallet_keys(user, x_wallet_secret)
+    api_key, secret_key = correct_wallet_keys(user)
     result = await alpaca.get_account(api_key, secret_key)
     if not result.ok:
         raise _alpaca_error(result)
@@ -84,11 +150,10 @@ async def get_wallet_account(
 
 @router.get("/positions", summary="Открытые позиции / портфель (Alpaca)")
 async def get_wallet_positions(
-    user: CurrentUserDep,
-    x_wallet_secret: WalletSecret = None,
+    user: CurrentUserDep
 ):
     """Список текущих позиций: тикер, кол-во, цена входа, текущая цена, P&L."""
-    api_key, secret_key = _wallet_keys(user, x_wallet_secret)
+    api_key, secret_key = correct_wallet_keys(user)
     result = await alpaca.get_positions(api_key, secret_key)
     if not result.ok:
         raise _alpaca_error(result)
@@ -113,13 +178,12 @@ async def get_wallet_positions(
 @router.get("/trades", summary="История исполненных сделок (Alpaca)")
 async def get_wallet_trades(
     user: CurrentUserDep,
-    x_wallet_secret: WalletSecret = None,
     page_size: Annotated[int, Query(ge=1, le=200)] = 50,
     after: Annotated[str | None, Query(description="ISO: 2024-01-01T00:00:00Z")] = None,
     until: Annotated[str | None, Query(description="ISO: 2024-12-31T23:59:59Z")] = None,
 ):
     """Исполненные сделки (FILL activities): тикер, сторона, кол-во, цена, время."""
-    api_key, secret_key = _wallet_keys(user, x_wallet_secret)
+    api_key, secret_key = correct_wallet_keys(user)
     result = await alpaca.get_activities(
         api_key, secret_key,
         activity_type="FILL",
@@ -148,14 +212,13 @@ async def get_wallet_trades(
 @router.get("/orders", summary="История ордеров (Alpaca)")
 async def get_wallet_orders(
     user: CurrentUserDep,
-    x_wallet_secret: WalletSecret = None,
     status: Annotated[str, Query(description="open | closed | all")] = "all",
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
     after: Annotated[str | None, Query(description="ISO datetime")] = None,
     until: Annotated[str | None, Query(description="ISO datetime")] = None,
 ):
     """История заявок. status=all включает открытые и исполненные."""
-    api_key, secret_key = _wallet_keys(user, x_wallet_secret)
+    api_key, secret_key = correct_wallet_keys(user)
     result = await alpaca.get_orders(
         api_key, secret_key,
         status=status, limit=limit,
@@ -169,7 +232,6 @@ async def get_wallet_orders(
 @router.get("/history", summary="Equity curve портфеля (Alpaca)")
 async def get_wallet_history(
     user: CurrentUserDep,
-    x_wallet_secret: WalletSecret = None,
     period: Annotated[str, Query(description="1D | 1W | 1M | 3M | 1A")] = "1M",
     timeframe: Annotated[str, Query(description="1Min | 5Min | 1H | 1D")] = "1D",
 ):
@@ -177,7 +239,7 @@ async def get_wallet_history(
     Исторические данные стоимости портфеля для графика доходности.
     Возвращает список точек: timestamp, equity, profit_loss, profit_loss_pct.
     """
-    api_key, secret_key = _wallet_keys(user, x_wallet_secret)
+    api_key, secret_key = correct_wallet_keys(user)
     result = await alpaca.get_portfolio_history(
         api_key, secret_key,
         period=period, timeframe=timeframe,

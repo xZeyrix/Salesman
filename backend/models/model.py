@@ -3,7 +3,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import BigInteger, Boolean, String, ForeignKey, func, Column, Integer, Text, DateTime, Enum
 from typing import Optional
 from backend.models.base import Base
-
+from cryptography.fernet import Fernet
+from sqlalchemy.dialects.postgresql import ARRAY
+key = Fernet.generate_key()
+cipher_suite = Fernet(key)
 
 class User(Base):
     __tablename__ = "users"
@@ -43,19 +46,22 @@ class Wallet(Base):
     def wallet_secret(self, value: str):
         encrypted_text = cipher_suite.encrypt(value.encode())
         self._wallet_secret = encrypted_text.decode()
-    
+
 class News(Base):
     __tablename__ = "news"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True) 
-    finhub_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
-    ticker: Mapped[str] = mapped_column(String(10), index=True, nullable=True)
+    alpaca_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
+    ticker: Mapped[Optional[str]] = mapped_column(String(10), index=True)
+    related_symbols: Mapped[list[str]] = mapped_column(ARRAY(String), server_default="{}")
+    
     category: Mapped[Optional[str]] = mapped_column(String(50))
-    headline: Mapped[str] = mapped_column(String(500))
-    image: Mapped[Optional[str]] = mapped_column(String(500))
-    related: Mapped[Optional[str]] = mapped_column(String(200))
-    source: Mapped[Optional[str]] = mapped_column(String(100))
+    headline: Mapped[str] = mapped_column(String(1000))
     summary: Mapped[Optional[str]] = mapped_column(Text)
-    url: Mapped[Optional[str]] = mapped_column(String(500))
-    datetime_unix: Mapped[int] = mapped_column(BigInteger)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    
+    source: Mapped[Optional[str]] = mapped_column(String(100))
+    url: Mapped[Optional[str]] = mapped_column(Text) 
+    image: Mapped[Optional[str]] = mapped_column(Text)
+    
+    published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

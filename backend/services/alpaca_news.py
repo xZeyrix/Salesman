@@ -1,8 +1,6 @@
 """
 Фоновый воркер сбора новостей через Alpaca Markets News API.
 
-Заменяет finhub.py полностью.
-
 API: GET https://data.alpaca.markets/v1beta1/news
 Документация: https://docs.alpaca.markets/reference/news-3
 
@@ -108,13 +106,7 @@ class AlpacaNewsCollector:
                     break
 
         return all_articles
-
     async def _save_batch(self, articles: list[dict], ticker: str | None = None):
-        """
-        Сохраняет статьи в БД.
-        Поле ticker — если запрос был по конкретному тикеру.
-        У каждой статьи есть поле symbols — список тикеров из Alpaca.
-        """
         if not articles:
             return
 
@@ -123,53 +115,55 @@ class AlpacaNewsCollector:
                 saved = 0
                 for article in articles:
                     alpaca_id = article.get("id")
-                    if not alpaca_id:
-                        continue
+                    if not alpaca_id: continue
 
                     headline = article.get("headline", "").strip()
-                    if not headline:
-                        continue
+                    if not headline: continue
 
-                    # Alpaca возвращает symbols как список → берём первый или переданный
-                    symbols: list = article.get("symbols", [])
+                    # 1. Логика тикеров
+                    symbols = article.get("symbols", [])
                     article_ticker = ticker or (symbols[0] if symbols else None)
-
-                    # Дата: Alpaca отдаёт ISO строку "2024-01-15T12:00:00Z"
-                    created_at_str = article.get("created_at", "")
-                    try:
-                        dt = datetime.fromisoformat(
-                            created_at_str.replace("Z", "+00:00")
-                        )
-                        datetime_unix = int(dt.timestamp())
-                    except Exception:
-                        datetime_unix = 0
-
-                    # related: все тикеры статьи через запятую
                     related = ",".join(symbols) if symbols else None
 
+                    # 2. Обработка даты
+                    created_at_str = article.get("created_at", "")
+                    try:
+                        dt = datetime.fromisoformat(created_at_str.replace("Z", "+00:00"))
+                        datetime_unix = int(dt.timestamp())
+                    except:
+                        datetime_unix = 0
+
+                    # 3. БЕЗОПАСНАЯ обработка изображений (исправлено)
+                    images = article.get("images", [])
+                    image_url = None
+                    if images:
+                        # Используем .get() везде, чтобы не поймать KeyError
+                        image_url = next(
+                            (img.get("url") for img in images if img.get("size") == "large"), 
+                            images[0].get("url")
+                        )
+                    # 4. Формирование запроса
                     stmt = (
                         insert(News)
                         .values(
-                            finhub_id=alpaca_id,      # поле переиспользуем как unique id
+                            alpaca_id=alpaca_id, 
                             ticker=article_ticker,
                             category=article.get("source", "alpaca"),
                             headline=headline[:500],
                             summary=article.get("summary"),
                             source=article.get("source"),
                             url=article.get("url"),
-                            image=(
-                                article["images"][0]["url"]
-                                if article.get("images")
-                                else None
-                            ),
+                            image=image_url,          # Передаем уже готовую переменную
                             related=related[:200] if related else None,
                             datetime_unix=datetime_unix,
                         )
                         .on_conflict_do_update(
-                            index_elements=["finhub_id"],
+                            index_elements=["alpaca_id"],
                             set_={
                                 "ticker": article_ticker,
                                 "related": related[:200] if related else None,
+                                "image": image_url,
+                                "summary": article.get("summary")
                             },
                         )
                     )
@@ -177,9 +171,7 @@ class AlpacaNewsCollector:
                     saved += 1
 
                 await session.commit()
-                label = f"тикер={ticker}" if ticker else "общие"
-                logger.info(f"Сохранено {saved} новостей [{label}]")
-
+                logger.info(f"Сохранено {saved} новостей.")
             except Exception as e:
                 logger.error(f"Ошибка записи в БД: {e}")
                 await session.rollback()

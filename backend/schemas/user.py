@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
-from enum import enum
+from enum import Enum
+
 class UserStatus(Enum, str):
     DEFAULT = 'DEFAULT'
     PREMIUM = 'PREMIUM'

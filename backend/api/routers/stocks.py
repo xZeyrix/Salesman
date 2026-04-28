@@ -1,20 +1,3 @@
-"""
-Router: /stocks — рыночные данные и кошелёк через Alpaca Markets.
-
-Эндпоинты:
-  GET  /stocks/{ticker}/price          — текущая цена (Alpaca snapshot)
-  GET  /stocks/{ticker}/news           — новости из БД
-  GET  /stocks/wallet/account          — баланс счёта (Alpaca)
-  GET  /stocks/wallet/positions        — портфель / позиции (Alpaca)
-  GET  /stocks/wallet/trades           — история сделок (Alpaca FILL activities)
-  GET  /stocks/wallet/orders           — история ордеров (Alpaca)
-  GET  /stocks/wallet/history          — equity curve портфеля (Alpaca)
-
-Ключи Alpaca (пользовательские):
-  api_key    -> User.wallet_key  (сохраняется через PATCH /user/update)
-  secret_key -> заголовок X-Wallet-Secret (не хранится в БД)
-"""
-
 import logging
 from typing import Annotated
 
@@ -26,7 +9,7 @@ from backend.api.deps import CurrentUserDep
 from backend.core.database import DBSessionDep
 from backend.models.model import News
 from backend.schemas.news import NewsResponse
-from backend.services.alpaca import alpaca   # singleton клиент
+from backend.services.alpaca import alpaca
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/stocks", tags=["Биржа"])
@@ -35,37 +18,6 @@ Ticker = Annotated[str, Path(min_length=1, max_length=20)]
 WalletSecret = Annotated[str | None, Header(alias="X-Wallet-Secret")]
 
 ALPACA_DATA_BASE = "https://data.alpaca.markets/v2"
-
-
-# ──────────────────────────────────────────────
-# Helpers
-# ──────────────────────────────────────────────
-
-def _wallet_keys(user, secret: str | None) -> tuple[str, str]:
-    if not user.wallet_key:
-        raise HTTPException(
-            status_code=400,
-            detail="Кошелёк Alpaca не привязан. "
-                   "Добавьте API-ключ через PATCH /user/update (поле wallet_key).",
-        )
-    if not secret:
-        raise HTTPException(
-            status_code=400,
-            detail="Необходим заголовок X-Wallet-Secret с секретным ключом Alpaca.",
-        )
-    return user.wallet_key, secret
-
-
-def _alpaca_error(result) -> HTTPException:
-    msg = result.error.message if result.error else "неизвестная ошибка"
-    code = result.error.code if result.error else 502
-    status = 401 if code == 401 else 502
-    return HTTPException(status_code=status, detail=f"Ошибка Alpaca: {msg}")
-
-
-# ──────────────────────────────────────────────
-# Рыночные данные
-# ──────────────────────────────────────────────
 
 @router.get("/{ticker}/price", summary="Текущая цена акции (Alpaca snapshot)")
 async def get_price(ticker: Ticker):

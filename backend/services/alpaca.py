@@ -1,22 +1,3 @@
-"""
-Async-клиент Alpaca Markets API.
-
-Документация: https://docs.alpaca.markets/
-
-Аутентификация — два заголовка на каждый запрос:
-  APCA-API-KEY-ID:     <api_key>
-  APCA-API-SECRET-KEY: <secret_key>
-
-Никакого HMAC. Ключи пользователя:
-  api_key    → User.wallet_key
-  secret_key → заголовок X-Wallet-Secret (не хранится в БД)
-
-Базовые URL:
-  Trading:  https://api.alpaca.markets/v2
-  Paper:    https://paper-api.alpaca.markets/v2  (для тестов)
-  News:     https://data.alpaca.markets/v1beta1
-"""
-
 import logging
 from dataclasses import dataclass
 from typing import Any
@@ -27,11 +8,6 @@ logger = logging.getLogger(__name__)
 
 TRADING_BASE = "https://api.alpaca.markets/v2"
 DATA_BASE = "https://data.alpaca.markets/v1beta1"
-
-
-# ──────────────────────────────────────────────
-# Результирующий тип
-# ──────────────────────────────────────────────
 
 @dataclass
 class AlpacaError:
@@ -45,18 +21,7 @@ class AlpacaResult:
     data: Any
     error: AlpacaError | None = None
 
-
-# ──────────────────────────────────────────────
-# Клиент
-# ──────────────────────────────────────────────
-
 class AlpacaClient:
-    """
-    Stateless async-клиент Alpaca Markets.
-    Один экземпляр обслуживает всех пользователей —
-    ключи передаются в каждый вызов.
-    """
-
     def __init__(self, timeout: float = 10.0):
         self._timeout = timeout
 
@@ -173,11 +138,6 @@ class AlpacaClient:
         after: str | None = None,
         until: str | None = None,
     ) -> AlpacaResult:
-        """
-        История активностей счёта — сделки, дивиденды, пополнения.
-        GET /v2/account/activities/{activity_type}
-        activity_type=FILL → только исполненные сделки
-        """
         params: dict = {"page_size": page_size, "direction": "desc"}
         if after:
             params["after"] = after
@@ -191,5 +151,4 @@ class AlpacaClient:
         )
 
 
-# Singleton
 alpaca = AlpacaClient()

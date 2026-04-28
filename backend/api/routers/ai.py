@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix='/ai', tags=['ИИ и чат'])
 ai = Salesman()
+
 @router.get('/chat/history', response_model=list[MessageResponse], description='сообщении от старых к новым')
 async def get_chat_history(user: CurrentUserDep,
                            dbsession: DBSessionDep,
@@ -66,8 +67,3 @@ async def send_message(user: CurrentUserDep,
         await dbsession.rollback()
         logger.error(msg=f'Ошибка в sendmessage {e}')
         raise HTTPException(status_code=500, detail="Ошибка сервера")
-
-@router.get('/analysis/{ticker}')
-async def analysis(ticker: Annotated[str, Path(min_length=2, max_length=30)],
-                   user: CurrentUserDep):
-    pass
