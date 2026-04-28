@@ -1,28 +1,33 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, field_serializer, computed_field
 
 
 class NewsResponse(BaseModel):
     ticker: Optional[str]
     headline: str
     summary: Optional[str]
-    datetime_unix: int
-    source: str
+    source: Optional[str]
     url: Optional[str]
     image: Optional[str]
     category: Optional[str]
-    related: Optional[str]
+
+    # В модели поле называется related_symbols (list[str]), отдаём на фронт как строку
+    related_symbols: list[str] = []
+
+    # published_at -> datetime, отдаём unix-timestamp для фронта
+    published_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
-    # ticker: ну название акции хз пусть будет 
-    # headline (Заголовок) — крупным шрифтом.
-    # summary (Описание) — основной текст.
-    # datetime_unix — для отображения времени (например, "5 минут назад").
-    # source — чтобы пользователь понимал, откуда инфа.
-    # url — чтобы можно было кликнуть и прочитать статью полностью.
-    # image — для визуализации (если null, ставь заглушку с логотипом компании).
-    # category — для фильтрации (например, вкладки "Крипта", "Слияния").
-    # related — чтобы подсветить тикеры компаний прямо в карточке.
+    @computed_field  # type: ignore[misc]
+    @property
+    def datetime_unix(self) -> int:
+        return int(self.published_at.timestamp())
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def related(self) -> Optional[str]:
+        """Удобная строка тикеров для фронта: 'AAPL,MSFT'"""
+        return ",".join(self.related_symbols) if self.related_symbols else None

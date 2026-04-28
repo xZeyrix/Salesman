@@ -5,8 +5,7 @@ from typing import Any
 import httpx
 
 logger = logging.getLogger(__name__)
-
-TRADING_BASE = "https://api.alpaca.markets/v2"
+TRADING_BASE = "https://paper-api.alpaca.markets/v2"
 DATA_BASE = "https://data.alpaca.markets/v1beta1"
 
 @dataclass

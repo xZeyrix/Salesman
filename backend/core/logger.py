@@ -14,6 +14,7 @@ def setup_logging():
         encoding="utf-8" 
     )
     
+
     # Настраиваем базовый конфиг
     logging.basicConfig(
         level=logging.INFO,

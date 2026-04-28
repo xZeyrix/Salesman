@@ -86,14 +86,14 @@ async def get_news(
     try:
         if ticker.lower() == "all":
             result = await dbsession.execute(
-                select(News).order_by(desc(News.datetime_unix)).limit(last_n)
+                select(News).order_by(desc(News.published_at)).limit(last_n)
             )
         else:
             t = ticker.upper()
             result = await dbsession.execute(
                 select(News)
-                .where(or_(News.ticker == t, News.related.contains(t)))
-                .order_by(desc(News.datetime_unix))
+                .where(or_(News.ticker == t, News.related_symbols.any(ticker)))
+                .order_by(desc(News.published_at))
                 .limit(last_n)
             )
         return list(reversed(result.scalars().all()))
