@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Уведомления — Salesman</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="back-header">
+    <a class="back-btn" href="profile.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <span class="back-title">Уведомления</span>
+  </div>
+
+  <div class="notif-item">
+    <div class="notif-dot unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">NVIDIA +3.8% 🚀</div>
+      <div class="notif-desc">Акция NVDA достигла вашего ценового уровня $875. ИИ рекомендует держать позицию.</div>
+      <div class="notif-time">2 часа назад</div>
+    </div>
+  </div>
+
+  <div class="notif-item">
+    <div class="notif-dot unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Портфель обновлён</div>
+      <div class="notif-desc">Ваш портфель вырос на +$318.42 (+1.3%) за сегодня. Общая стоимость: $24 836.50.</div>
+      <div class="notif-time">3 часа назад</div>
+    </div>
+  </div>
+
+  <div class="notif-item">
+    <div class="notif-dot unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Tesla предупреждение ⚠️</div>
+      <div class="notif-desc">TSLA упала ниже $250. ИИ считает это краткосрочным давлением — поддержка на $230.</div>
+      <div class="notif-time">5 часов назад</div>
+    </div>
+  </div>
+
+  <div class="notif-item">
+    <div class="notif-dot read"></div>
+    <div class="notif-body">
+      <div class="notif-title">Новая рекомендация</div>
+      <div class="notif-desc">ИИ советует рассмотреть добавление Meta Platforms в портфель. Рост рекламных доходов +18%.</div>
+      <div class="notif-time">Вчера, 18:30</div>
+    </div>
+  </div>
+
+  <div class="notif-item">
+    <div class="notif-dot read"></div>
+    <div class="notif-body">
+      <div class="notif-title">ФРС снизила ставку</div>
+      <div class="notif-desc">Федеральная резервная система снизила ставку до 4.75%. Это позитивно для tech-акций.</div>
+      <div class="notif-time">Вчера, 22:00</div>
+    </div>
+  </div>
+
+  <div class="notif-item">
+    <div class="notif-dot read"></div>
+    <div class="notif-body">
+      <div class="notif-title">Apple отчётность</div>
+      <div class="notif-desc">Apple опубликует квартальные результаты через 3 дня. Аналитики ожидают рост EPS на 8%.</div>
+      <div class="notif-time">2 дня назад</div>
+    </div>
+  </div>
+
+  <div style="padding:0 20px;margin-top:16px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:14px">Настройки уведомлений</div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:500">Изменения цен</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">При движении ±5%</div>
+        </div>
+        <button class="toggle on" id="t1"></button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:500">Рекомендации ИИ</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Советы по покупке/продаже</div>
+        </div>
+        <button class="toggle on" id="t2"></button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:500">Новости рынка</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Важные события</div>
+        </div>
+        <button class="toggle" id="t3"></button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+        <div>
+          <div style="font-size:13px;font-weight:500">Итоги дня</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Ежедневный отчёт в 18:00</div>
+        </div>
+        <button class="toggle on" id="t4"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

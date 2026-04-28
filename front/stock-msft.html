@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MSFT — Salesman</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .tv-widget-wrap {
+      margin: 0 20px 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      height: 200px;
+    }
+
+    .chart-tabs {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="back-header">
+    <a class="back-btn" href="index.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6" />
+      </svg>
+    </a>
+    <span class="back-title">MSFT</span>
+  </div>
+
+  <div class="stock-hero">
+    <div class="stock-hero-sym">Microsoft</div>
+    <div class="stock-hero-name">NASDAQ · Технологии / Облако</div>
+    <div class="stock-hero-price">Загрузка...</div>
+    <div class="stock-hero-change">—</div>
+  </div>
+
+  <div class="tv-widget-wrap">
+    <div class="tradingview-widget-container" style="height:100%">
+      <div id="tv_chart_msft" style="height:100%"></div>
+    </div>
+  </div>
+
+  <div class="rating-card">
+    <div class="rating-icon">💎</div>
+    <div>
+      <div class="rating-label">Оценка ИИ</div>
+      <div class="rating-val" style="color:var(--green)">Топ выбор</div>
+      <div class="rating-desc">Microsoft занимает лидирующие позиции в облаке — Azure растё...</div>
+    </div>
+  </div>
+
+  <div style="padding:0 20px;margin-bottom:16px">
+    <button class="btn-full btn-primary" onclick="window.location.href='portfolio.html'">Купить</button>
+  </div>
+
+  <div class="ai-comment-card">
+    <div class="ai-comment-top">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+      ИИ Аналитик
+    </div>
+    <div class="ai-comment-text">Microsoft занимает лидирующие позиции в облаке — Azure растёт на 28% г/г. Инвестиции в
+      OpenAI дают стратегическое преимущество. Copilot интегрируется в весь продуктовый стек.</div>
+  </div>
+
+  <div style="padding:0 20px;margin-bottom:20px">
+    <button class="btn-full btn-secondary" onclick="window.location.href='ai.html?stock=MSFT'">Спросить подробнее у
+      ИИ</button>
+  </div>
+
+  <div class="stock-about">
+    <div class="about-title">О компании</div>
+    <div class="about-row"><span class="about-key">Основана</span><span class="about-val">1975 год</span></div>
+    <div class="about-row"><span class="about-key">Основатель</span><span class="about-val">Билл Гейтс</span></div>
+    <div class="about-row"><span class="about-key">Штаб-квартира</span><span class="about-val">Редмонд, США</span></div>
+    <div class="about-row"><span class="about-key">Сектор</span><span class="about-val">Технологии / Облако</span></div>
+    <div class="about-row"><span class="about-key">Открытие</span><span class="about-val"><span
+          data-field="open">—</span></span></div>
+    <div class="about-row"><span class="about-key">Максимум дня</span><span class="about-val"><span
+          data-field="high">—</span></span></div>
+    <div class="about-row"><span class="about-key">Минимум дня</span><span class="about-val"><span
+          data-field="low">—</span></span></div>
+    <div class="about-row"><span class="about-key">Пред. закрытие</span><span class="about-val"><span
+          data-field="prev_close">—</span></span></div>
+    <div class="about-row"><span class="about-key">Объём</span><span class="about-val"><span
+          data-field="volume">—</span></span></div>
+  </div>
+
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script>
+    new TradingView.widget({
+      container_id: 'tv_chart_msft',
+      symbol: 'NASDAQ:MSFT',
+      interval: 'D',
+      timezone: 'America/New_York',
+      theme: 'dark',
+      style: '1',
+      locale: 'ru',
+      toolbar_bg: '#141414',
+      enable_publishing: false,
+      hide_top_toolbar: false,
+      hide_legend: true,
+      save_image: false,
+      height: 200,
+      width: '100%',
+      hide_side_toolbar: true,
+      allow_symbol_change: false,
+      backgroundColor: '#141414',
+      gridColor: 'rgba(255,255,255,0.04)',
+    });
+  </script>
+  <script src="main.js"></script>
+</body>
+
+</html>

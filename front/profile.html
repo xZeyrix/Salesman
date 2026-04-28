@@ -1,135 +1,268 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Профиль</title>
+  <title>Профиль — Salesman</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0
+      }
+
+      100% {
+        background-position: -200% 0
+      }
+    }
+
+    .stat-sub.up {
+      color: var(--green)
+    }
+
+    .stat-sub.down {
+      color: var(--red)
+    }
+  </style>
 </head>
+
 <body>
 
+  <!-- Шапка профиля -->
   <div class="profile-hero">
-    <div class="avatar">НА</div>
+    <div class="avatar" id="profile-avatar">—</div>
     <div>
-      <div class="profile-name">Нургабыл Айкын</div>
-      <div class="profile-since">Инвестор с 2026 года</div>
+      <div class="profile-name" id="profile-name"><span class="skeleton" style="width:140px;height:20px">&nbsp;</span>
+      </div>
+      <div class="profile-since" id="profile-status"><span class="skeleton"
+          style="width:100px;height:12px">&nbsp;</span></div>
     </div>
   </div>
 
+  <!-- Статы из /wallet/account -->
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">Общая прибыль</div>
-      <div class="stat-val" style="color:var(--green)">+24.2%</div>
-      <div class="stat-sub up">За всё время</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Сделок</div>
-      <div class="stat-val">47</div>
-      <div class="stat-sub" style="color:var(--text3)">38 прибыльных</div>
-    </div>
+
     <div class="stat-card">
       <div class="stat-label">Портфель</div>
-      <div class="stat-val">$7864.20</div>
-      <div class="stat-sub up">+$318 сегодня</div>
+      <div class="stat-val" id="stat-portfolio"><span class="skeleton" style="width:80px;height:22px">&nbsp;</span>
+      </div>
+      <div class="stat-sub" id="stat-portfolio-sub">—</div>
     </div>
+
     <div class="stat-card">
-      <div class="stat-label">Акций</div>
-      <div class="stat-val">4</div>
-      <div class="stat-sub" style="color:var(--text3)">В 3 секторах</div>
+      <div class="stat-label">Кэш</div>
+      <div class="stat-val" id="stat-cash"><span class="skeleton" style="width:80px;height:22px">&nbsp;</span></div>
+      <div class="stat-sub" id="stat-bp">—</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">P&L сегодня</div>
+      <div class="stat-val" id="stat-daypl"><span class="skeleton" style="width:80px;height:22px">&nbsp;</span></div>
+      <div class="stat-sub" id="stat-daypl-pct">—</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Позиций</div>
+      <div class="stat-val" id="stat-positions"><span class="skeleton" style="width:40px;height:22px">&nbsp;</span>
+      </div>
+      <div class="stat-sub" id="stat-positions-sub">—</div>
+    </div>
+
+  </div>
+
+  <!-- Предупреждение если кошелёк не привязан (404 / 400 от бэка) -->
+  <div id="wallet-warn" style="display:none;margin:0 20px 16px">
+    <div
+      style="background:rgba(232,130,74,0.08);border:1px solid rgba(232,130,74,0.25);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--accent2)">
+      ⚠️ Alpaca-кошелёк не привязан.
+      <a href="accounts.html" style="color:var(--accent2);text-decoration:underline">Подключить счёт →</a>
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-title" style="margin-bottom:14px">Уровень риска</div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
-      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:10px">
-        <span>Консервативный</span><span>Умеренный</span><span>Агрессивный</span>
-      </div>
-      <div style="height:6px;background:var(--bg4);border-radius:3px;overflow:hidden">
-        <div style="height:100%;width:60%;background:linear-gradient(90deg,#4ec994,#e8824a);border-radius:3px"></div>
-      </div>
-      <div style="font-size:12px;color:var(--text2);margin-top:8px">Умеренный — 60%</div>
-    </div>
-  </div>
-
+  <!-- Меню -->
   <div class="menu-section">
     <div class="section-title" style="margin-bottom:4px">Настройки</div>
-    <div class="menu-item">
-      <div class="menu-icon" style="background:rgba(232,130,74,0.12)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8824a" stroke-width="1.8">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-        </svg>
-      </div>
-      <span class="menu-label">Уведомления</span>
-      <span class="menu-chevron">›</span>
-    </div>
-    <div class="menu-item">
+
+    <a class="menu-item" href="accounts.html">
       <div class="menu-icon" style="background:rgba(78,201,148,0.1)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ec994" stroke-width="1.8">
-          <rect x="2" y="3" width="20" height="14" rx="2"/>
-          <line x1="8" y1="21" x2="16" y2="21"/>
-          <line x1="12" y1="17" x2="12" y2="21"/>
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <line x1="8" y1="21" x2="16" y2="21" />
+          <line x1="12" y1="17" x2="12" y2="21" />
         </svg>
       </div>
       <span class="menu-label">Связанные счета</span>
       <span class="menu-chevron">›</span>
-    </div>
-    <div class="menu-item">
-      <div class="menu-icon" style="background:rgba(232,200,74,0.1)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8c84a" stroke-width="1.8">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+    </a>
+
+    <a class="menu-item" href="notifications.html">
+      <div class="menu-icon" style="background:rgba(232,130,74,0.12)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8824a" stroke-width="1.8">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
       </div>
-      <span class="menu-label">ИИ-предпочтения</span>
+      <span class="menu-label">Уведомления</span>
       <span class="menu-chevron">›</span>
-    </div>
-    <div class="menu-item" onclick="window.location.href='login.html'">
+    </a>
+
+    <a class="menu-item" href="login.html">
       <div class="menu-icon" style="background:rgba(232,92,92,0.1)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e85c5c" stroke-width="1.8">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
         </svg>
       </div>
       <span class="menu-label">Выйти</span>
       <span class="menu-chevron">›</span>
-    </div>
+    </a>
+
   </div>
 
+  <!-- Нижняя навигация -->
   <nav class="nav">
     <a class="nav-item" href="index.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
       </svg>
       Главная
     </a>
     <a class="nav-item" href="portfolio.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <rect x="2" y="7" width="20" height="14" rx="2"/>
-        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        <rect x="2" y="7" width="20" height="14" rx="2" />
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
       </svg>
       Портфель
     </a>
     <a class="nav-item" href="ai.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-        <line x1="12" y1="17" x2="12.01" y2="17"/>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
       </svg>
       ИИ
     </a>
-    <a class="nav-item" href="profile.html">
+    <a class="nav-item active" href="profile.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
       </svg>
       Профиль
     </a>
   </nav>
 
   <script src="main.js"></script>
+  <script>
+    function fmtUsd(v) {
+      const n = parseFloat(v);
+      if (v == null || isNaN(n)) return '—';
+      const abs = Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return (n < 0 ? '-' : '') + '$' + abs;
+    }
+
+    function initUserInfo() {
+      const tg = window.Telegram?.WebApp;
+      const user = tg?.initDataUnsafe?.user;
+      if (user) {
+        const name = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username || 'Инвестор';
+        document.getElementById('profile-name').textContent = name;
+        document.getElementById('profile-avatar').textContent = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      } else {
+        document.getElementById('profile-name').textContent = 'Инвестор';
+        document.getElementById('profile-avatar').textContent = 'ИН';
+      }
+    }
+
+    // GET /wallet/account
+    async function loadAccount() {
+      const res = await fetch(`${API_CONFIG.baseUrl}/wallet/account`, { headers: apiHeaders() });
+
+      if (res.status === 404 || res.status === 400) {
+        showNoWallet();
+        return;
+      }
+      if (!res.ok) throw new Error(res.status);
+
+      const acc = await res.json();
+
+      // Статус счёта (поле status из Alpaca: ACTIVE / ACCOUNT_UPDATED / …)
+      document.getElementById('profile-status').textContent =
+        acc.status ? `Счёт Alpaca: ${acc.status}` : 'Alpaca';
+
+      // portfolio_value (или equity как fallback)
+      const equity = parseFloat(acc.portfolio_value ?? acc.equity ?? 0);
+      // last_equity — вчерашнее значение equity
+      const lastEq = parseFloat(acc.last_equity ?? equity);
+      const dayPl = equity - lastEq;
+      const dayPlPct = lastEq ? (dayPl / lastEq * 100) : 0;
+      const sign = dayPl >= 0 ? '+' : '';
+
+      document.getElementById('stat-portfolio').textContent = fmtUsd(equity);
+      const sub = document.getElementById('stat-portfolio-sub');
+      sub.textContent = `${sign}${dayPlPct.toFixed(2)}% за день`;
+      sub.className = 'stat-sub ' + (dayPl >= 0 ? 'up' : 'down');
+
+      // cash
+      document.getElementById('stat-cash').textContent = fmtUsd(acc.cash);
+      // buying_power
+      document.getElementById('stat-bp').textContent =
+        acc.buying_power != null ? `BP: ${fmtUsd(acc.buying_power)}` : '—';
+
+      // P&L сегодня = equity - last_equity
+      const plEl = document.getElementById('stat-daypl');
+      plEl.textContent = `${sign}${fmtUsd(dayPl)}`;
+      plEl.style.color = dayPl >= 0 ? 'var(--green)' : 'var(--red)';
+      document.getElementById('stat-daypl-pct').textContent = `${sign}${dayPlPct.toFixed(2)}%`;
+    }
+
+    // GET /wallet/positions — только считаем количество + первые тикеры
+    async function loadPositions() {
+      const res = await fetch(`${API_CONFIG.baseUrl}/wallet/positions`, { headers: apiHeaders() });
+      if (!res.ok) return;
+      const list = await res.json();
+
+      document.getElementById('stat-positions').textContent = list.length;
+      document.getElementById('stat-positions-sub').textContent =
+        list.length > 0
+          ? list.slice(0, 3).map(p => p.symbol).join(', ') + (list.length > 3 ? '…' : '')
+          : 'Нет позиций';
+    }
+
+    function showNoWallet() {
+      document.getElementById('wallet-warn').style.display = '';
+      ['stat-portfolio', 'stat-cash', 'stat-daypl', 'stat-positions'].forEach(id => {
+        document.getElementById(id).textContent = '—';
+      });
+      ['stat-portfolio-sub', 'stat-bp', 'stat-daypl-pct', 'stat-positions-sub'].forEach(id => {
+        document.getElementById(id).textContent = '—';
+      });
+      document.getElementById('profile-status').textContent = 'Кошелёк не привязан';
+    }
+
+    async function init() {
+      initUserInfo();
+      try {
+        await loadAccount();
+        await loadPositions();
+      } catch (e) {
+        console.error('Profile load error:', e);
+        showNoWallet();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
+
 </html>

@@ -1,171 +1,587 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Портфель</title>
+  <title>Портфель — Salesman</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0
+      }
+
+      100% {
+        background-position: -200% 0
+      }
+    }
+
+    .skeleton-line {
+      height: 14px;
+      width: 80%;
+      margin: 4px 0;
+    }
+
+    .skeleton-val {
+      height: 28px;
+      width: 60%;
+      margin: 4px 0;
+    }
+
+    .position-row {
+      display: flex;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .pos-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .pos-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .pos-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .pos-right {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .pos-price {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .pos-pl {
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .trades-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .trades-table th {
+      color: var(--text3);
+      font-weight: 500;
+      padding: 8px 6px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .trades-table td {
+      padding: 10px 6px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text2);
+    }
+
+    .trades-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .side-buy {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .side-sell {
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    .wallet-not-connected {
+      margin: 0 20px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+    }
+
+    .wallet-not-connected h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .wallet-not-connected p {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .tabs-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--bg3);
+      color: var(--text3);
+      font-family: "Open Sans", sans-serif;
+      transition: all 0.15s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent3);
+      color: var(--accent2);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-row-key {
+      color: var(--text3);
+    }
+
+    .stat-row-val {
+      font-weight: 500;
+    }
+
+    .error-msg {
+      color: var(--red);
+      font-size: 13px;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .loading-msg {
+      color: var(--text3);
+      font-size: 13px;
+      text-align: center;
+      padding: 16px;
+    }
+  </style>
 </head>
+
 <body>
 
   <div class="page-header">
     <div>
       <div class="page-title">Мой портфель</div>
-      <div class="page-subtitle">Обновлено сейчас</div>
+      <div class="page-subtitle" id="update-time">Обновление...</div>
     </div>
+    <button id="refresh-btn"
+      style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'Open Sans',sans-serif"
+      onclick="loadAll()">↻ Обновить</button>
   </div>
 
-  <div class="portfolio-hero">
+  <!-- Portfolio Hero -->
+  <div class="portfolio-hero" id="portfolio-hero">
     <div class="portfolio-label">Общая стоимость</div>
-    <div class="portfolio-value">$7 864.20</div>
-    <div class="portfolio-change up">+$318.42 (+1.3%) сегодня</div>
+    <div class="portfolio-value" id="hero-value"><span class="skeleton skeleton-val"
+        style="display:inline-block;width:140px">&nbsp;</span></div>
+    <div class="portfolio-change" id="hero-change">&nbsp;</div>
     <div class="portfolio-stats">
       <div>
-        <div class="pstat-label">Вложено</div>
-        <div class="pstat-val">$5 000</div>
+        <div class="pstat-label">Баланс</div>
+        <div class="pstat-val" id="stat-cash">—</div>
       </div>
       <div>
-        <div class="pstat-label">Прибыль</div>
-        <div class="pstat-val" style="color:var(--green)">+$2 864.20</div>
+        <div class="pstat-label">Покупательная</div>
+        <div class="pstat-val" id="stat-bp">—</div>
       </div>
       <div>
-        <div class="pstat-label">Доходность</div>
-        <div class="pstat-val" style="color:var(--green)">+24.2%</div>
+        <div class="pstat-label">Дневной P&L</div>
+        <div class="pstat-val" id="stat-daypl">—</div>
       </div>
     </div>
   </div>
 
+  <!-- Tabs: Positions / Trades / Orders -->
   <div class="section">
-    <div class="section-header">
-      <span class="section-title">Мои акции</span>
-      <span class="section-link">+ Добавить</span>
+    <div class="tabs-row">
+      <button class="tab-btn active" onclick="switchTab('positions', this)">Позиции</button>
+      <button class="tab-btn" onclick="switchTab('trades', this)">Сделки</button>
+      <button class="tab-btn" onclick="switchTab('orders', this)">Ордера</button>
     </div>
 
-    <div class="stock-row">
-      <div class="stock-icon" style="background:#1c1610;color:#e8c84a">A</div>
-      <div>
-        <div class="stock-name">Apple</div>
-        <div class="stock-full">5 акций · $947.10</div>
-      </div>
-      <div class="stock-right">
-        <div class="stock-price">$189.42</div>
-        <div class="stock-change up">+1.2%</div>
+    <!-- Positions -->
+    <div id="tab-positions">
+      <div id="positions-list">
+        <div class="loading-msg">Загрузка позиций...</div>
       </div>
     </div>
 
-    <div class="stock-row">
-      <div class="stock-icon" style="background:#1c1610;color:#e8824a">N</div>
-      <div>
-        <div class="stock-name">NVIDIA</div>
-        <div class="stock-full">3 акции · $2 625.90</div>
-      </div>
-      <div class="stock-right">
-        <div class="stock-price">$875.30</div>
-        <div class="stock-change up">+3.8%</div>
+    <!-- Trades -->
+    <div id="tab-trades" style="display:none">
+      <div id="trades-list">
+        <div class="loading-msg">Загрузка сделок...</div>
       </div>
     </div>
 
-    <div class="stock-row">
-      <div class="stock-icon" style="background:#101c10;color:#4ec994">M</div>
-      <div>
-        <div class="stock-name">Microsoft</div>
-        <div class="stock-full">8 акций · $3 300.80</div>
-      </div>
-      <div class="stock-right">
-        <div class="stock-price">$412.60</div>
-        <div class="stock-change up">+0.9%</div>
+    <!-- Orders -->
+    <div id="tab-orders" style="display:none">
+      <div id="orders-list">
+        <div class="loading-msg">Загрузка ордеров...</div>
       </div>
     </div>
-
-    <div class="stock-row">
-      <div class="stock-icon" style="background:#1c1010;color:#e85c5c">T</div>
-      <div>
-        <div class="stock-name">Tesla</div>
-        <div class="stock-full">4 акции · $992.40</div>
-      </div>
-      <div class="stock-right">
-        <div class="stock-price">$248.10</div>
-        <div class="stock-change down">−2.4%</div>
-      </div>
-    </div>
-
   </div>
 
-  <div class="section">
+  <!-- Wallet Not Connected Banner (hidden by default) -->
+  <div class="wallet-not-connected" id="wallet-banner" style="display:none">
+    <div style="font-size:32px;margin-bottom:12px">🏦</div>
+    <h3>Кошелёк не подключён</h3>
+    <p>Подключите Alpaca-счёт чтобы видеть реальный портфель, позиции и историю сделок.</p>
+    <button class="btn-full btn-primary" onclick="window.location.href='accounts.html'"
+      style="max-width:220px;margin:0 auto">Подключить счёт</button>
+  </div>
+
+  <!-- News section -->
+  <div class="section" style="margin-top:8px">
     <div class="section-header">
-      <span class="section-title">Рекомендации</span>
+      <span class="section-title">Новости рынка</span>
+      <a class="section-link" href="news.html">Все</a>
     </div>
-
-    <div class="suggestion-card">
-      <div class="suggestion-header">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="stock-icon" style="background:#1c1610;color:#e8824a;width:34px;height:34px">M</div>
-          <div>
-            <div class="stock-name">Meta Platforms</div>
-            <div style="font-size:11px;color:var(--text3)">$498.70</div>
-          </div>
-        </div>
-        <div class="badge badge-accent">Купить</div>
-      </div>
-      <div class="suggestion-reason">Похож на NVDA и AAPL в вашем портфеле. Рост рекламных доходов +18% — подходит вашей стратегии.</div>
-      <div class="suggestion-footer">
-        <button class="btn btn-buy">Купить</button>
-        <button class="btn btn-watch">В список</button>
-      </div>
+    <div class="news-scroll" id="portfolio-news">
+      <div class="loading-msg">Загрузка...</div>
     </div>
-
-    <div class="suggestion-card">
-      <div class="suggestion-header">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="stock-icon" style="background:#101c10;color:#4ec994;width:34px;height:34px">G</div>
-          <div>
-            <div class="stock-name">Alphabet</div>
-            <div style="font-size:11px;color:var(--text3)">$168.20</div>
-          </div>
-        </div>
-        <div class="badge badge-green">+1.5%</div>
-      </div>
-      <div class="suggestion-reason">Диверсификация вашего tech-портфеля. Облачный сегмент Google Cloud растёт на 28% г/г.</div>
-      <div class="suggestion-footer">
-        <button class="btn btn-buy">Купить</button>
-        <button class="btn btn-watch">В список</button>
-      </div>
-    </div>
-
   </div>
 
   <nav class="nav">
     <a class="nav-item" href="index.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
       </svg>
       Главная
     </a>
-    <a class="nav-item" href="portfolio.html">
+    <a class="nav-item active" href="portfolio.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <rect x="2" y="7" width="20" height="14" rx="2"/>
-        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        <rect x="2" y="7" width="20" height="14" rx="2" />
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
       </svg>
       Портфель
     </a>
     <a class="nav-item" href="ai.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-        <line x1="12" y1="17" x2="12.01" y2="17"/>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
       </svg>
       ИИ
     </a>
     <a class="nav-item" href="profile.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
       </svg>
       Профиль
     </a>
   </nav>
 
   <script src="main.js"></script>
+  <script>
+    // ── HELPERS ──────────────────────────────────────────
+    function fmt(val, decimals = 2) {
+      if (val == null || val === '') return '—';
+      const n = parseFloat(val);
+      if (isNaN(n)) return '—';
+      return '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+    function fmtPct(val) {
+      if (val == null) return '';
+      const n = parseFloat(val) * 100;
+      return (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+    }
+    function fmtDate(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
+    function colorClass(val) {
+      return parseFloat(val) >= 0 ? 'up' : 'down';
+    }
+
+    // Stock icon colors map
+    const iconColors = {
+      AAPL: { bg: '#1c1610', fg: '#e8c84a', l: 'A' },
+      NVDA: { bg: '#1c1610', fg: '#e8824a', l: 'N' },
+      MSFT: { bg: '#101c10', fg: '#4ec994', l: 'M' },
+      TSLA: { bg: '#1c1010', fg: '#e85c5c', l: 'T' },
+      META: { bg: '#1c1018', fg: '#d070e8', l: 'M' },
+      GOOGL: { bg: '#101c10', fg: '#4ec994', l: 'G' },
+      AMZN: { bg: '#1c1610', fg: '#e8824a', l: 'A' },
+    };
+    function getIcon(sym) {
+      const ic = iconColors[sym] || { bg: '#181818', fg: '#a09890', l: sym[0] };
+      return `<div class="pos-icon" style="background:${ic.bg};color:${ic.fg}">${ic.l}</div>`;
+    }
+    function stockLink(sym) {
+      const known = ['AAPL', 'NVDA', 'MSFT', 'TSLA', 'META', 'GOOGL'];
+      return known.includes(sym) ? `stock-${sym.toLowerCase()}.html` : '#';
+    }
+
+    // ── TAB SWITCHER ─────────────────────────────────────
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ['positions', 'trades', 'orders'].forEach(t => {
+        document.getElementById(`tab-${t}`).style.display = t === name ? '' : 'none';
+      });
+    }
+
+    // ── ACCOUNT (hero) ───────────────────────────────────
+    async function loadAccount() {
+      try {
+        const res = await fetch(`${API_CONFIG.baseUrl}/wallet/account`, { headers: apiHeaders() });
+
+        if (res.status === 404 || res.status === 400) {
+          showWalletBanner();
+          return false;
+        }
+        if (res.status === 401) {
+          document.getElementById('hero-value').textContent = 'Ошибка ключей Alpaca';
+          document.getElementById('hero-change').textContent = 'Проверьте API-ключи в настройках';
+          return false;
+        }
+        if (!res.ok) throw new Error(res.status);
+
+        const acc = await res.json();
+
+        const equity = parseFloat(acc.portfolio_value || acc.equity || 0);
+        const lastEq = parseFloat(acc.last_equity || equity);
+        const dayPl = equity - lastEq;
+        const dayPlPct = lastEq ? (dayPl / lastEq * 100) : 0;
+
+        document.getElementById('hero-value').textContent = fmt(equity);
+
+        const changeEl = document.getElementById('hero-change');
+        const sign = dayPl >= 0 ? '+' : '';
+        changeEl.textContent = `${sign}${fmt(dayPl)} (${sign}${dayPlPct.toFixed(2)}%) сегодня`;
+        changeEl.className = 'portfolio-change ' + (dayPl >= 0 ? 'up' : 'down');
+
+        document.getElementById('stat-cash').textContent = fmt(acc.cash);
+        document.getElementById('stat-bp').textContent = fmt(acc.buying_power);
+
+        const dpl = document.getElementById('stat-daypl');
+        dpl.textContent = (dayPl >= 0 ? '+' : '') + fmt(dayPl);
+        dpl.style.color = dayPl >= 0 ? 'var(--green)' : 'var(--red)';
+
+        document.getElementById('update-time').textContent = 'Обновлено ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        return true;
+
+      } catch (e) {
+        console.error('Account error:', e);
+        document.getElementById('hero-value').textContent = 'Ошибка загрузки';
+        return false;
+      }
+    }
+
+    // ── POSITIONS ────────────────────────────────────────
+    async function loadPositions() {
+      const container = document.getElementById('positions-list');
+      try {
+        const res = await fetch(`${API_CONFIG.baseUrl}/wallet/positions`, { headers: apiHeaders() });
+        if (res.status === 404 || res.status === 400) { container.innerHTML = ''; return; }
+        if (!res.ok) throw new Error(res.status);
+
+        const positions = await res.json();
+
+        if (!positions.length) {
+          container.innerHTML = '<div class="loading-msg">Позиций нет. Купите первую акцию!</div>';
+          return;
+        }
+
+        container.innerHTML = positions.map(p => {
+          const pl = parseFloat(p.unrealized_pl || 0);
+          const plPct = parseFloat(p.unrealized_plpc || 0) * 100;
+          const plSign = pl >= 0 ? '+' : '';
+          const mv = parseFloat(p.market_value || 0);
+          return `
+            <a class="position-row" href="${stockLink(p.symbol)}">
+              ${getIcon(p.symbol)}
+              <div>
+                <div class="pos-name">${p.symbol}</div>
+                <div class="pos-sub">${p.qty} акц. · ср. ${fmt(p.avg_entry_price)}</div>
+              </div>
+              <div class="pos-right">
+                <div class="pos-price">${fmt(p.current_price)}</div>
+                <div class="pos-pl ${colorClass(pl)}">${plSign}${fmt(p.unrealized_pl)} (${plSign}${plPct.toFixed(2)}%)</div>
+              </div>
+            </a>
+          `;
+        }).join('');
+
+      } catch (e) {
+        container.innerHTML = `<div class="error-msg">Ошибка загрузки позиций</div>`;
+      }
+    }
+
+    // ── TRADES ───────────────────────────────────────────
+    async function loadTrades() {
+      const container = document.getElementById('trades-list');
+      try {
+        const res = await fetch(`${API_CONFIG.baseUrl}/wallet/trades?page_size=30`, { headers: apiHeaders() });
+        if (res.status === 404 || res.status === 400) { container.innerHTML = ''; return; }
+        if (!res.ok) throw new Error(res.status);
+
+        const trades = await res.json();
+        if (!trades.length) {
+          container.innerHTML = '<div class="loading-msg">Сделок пока нет</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0 14px;overflow:hidden">
+            <table class="trades-table">
+              <thead><tr>
+                <th>Тикер</th><th>Сторона</th><th>Кол-во</th><th>Цена</th><th>Дата</th>
+              </tr></thead>
+              <tbody>
+                ${trades.map(t => `
+                  <tr>
+                    <td style="font-weight:600;color:var(--text)">${t.symbol}</td>
+                    <td class="${t.side === 'buy' ? 'side-buy' : 'side-sell'}">${t.side === 'buy' ? '▲ Покупка' : '▼ Продажа'}</td>
+                    <td>${parseFloat(t.qty).toFixed(4)}</td>
+                    <td>${fmt(t.price)}</td>
+                    <td>${fmtDate(t.transaction_time)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      } catch (e) {
+        container.innerHTML = `<div class="error-msg">Ошибка загрузки сделок</div>`;
+      }
+    }
+
+    // ── ORDERS ───────────────────────────────────────────
+    async function loadOrders() {
+      const container = document.getElementById('orders-list');
+      try {
+        const res = await fetch(`${API_CONFIG.baseUrl}/wallet/orders?status=all&limit=20`, { headers: apiHeaders() });
+        if (res.status === 404 || res.status === 400) { container.innerHTML = ''; return; }
+        if (!res.ok) throw new Error(res.status);
+
+        const orders = await res.json();
+        if (!orders.length) {
+          container.innerHTML = '<div class="loading-msg">Ордеров нет</div>';
+          return;
+        }
+
+        const statusLabel = { filled: 'Исполнен', canceled: 'Отменён', new: 'Новый', partially_filled: 'Частично', accepted: 'Принят', pending_new: 'Ожидание' };
+        const statusColor = { filled: 'var(--green)', canceled: 'var(--text3)', new: 'var(--accent2)', partially_filled: 'var(--gold)' };
+
+        container.innerHTML = `
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0 14px;overflow:hidden">
+            <table class="trades-table">
+              <thead><tr>
+                <th>Тикер</th><th>Тип</th><th>Кол-во</th><th>Статус</th><th>Дата</th>
+              </tr></thead>
+              <tbody>
+                ${orders.map(o => `
+                  <tr>
+                    <td style="font-weight:600;color:var(--text)">${o.symbol || '—'}</td>
+                    <td class="${o.side === 'buy' ? 'side-buy' : 'side-sell'}">${o.side === 'buy' ? '▲' : '▼'} ${o.type || ''}</td>
+                    <td>${parseFloat(o.qty || 0).toFixed(4)}</td>
+                    <td style="color:${statusColor[o.status] || 'var(--text3)'}">${statusLabel[o.status] || o.status}</td>
+                    <td>${fmtDate(o.created_at || o.submitted_at)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      } catch (e) {
+        container.innerHTML = `<div class="error-msg">Ошибка загрузки ордеров</div>`;
+      }
+    }
+
+    // ── PORTFOLIO NEWS ────────────────────────────────────
+    async function loadPortfolioNews() {
+      const container = document.getElementById('portfolio-news');
+      try {
+        const res = await fetch(`${API_CONFIG.baseUrl}/stocks/all/news?last_n=5`);
+        if (!res.ok) return;
+        const news = await res.json();
+        if (!news.length) { container.innerHTML = ''; return; }
+
+        container.innerHTML = news.slice(0, 5).map(n => `
+          <a class="news-card" href="${n.url || '#'}" target="_blank" rel="noopener">
+            <div class="news-tag">${n.ticker || 'Рынок'}</div>
+            <div class="news-title">${n.headline}</div>
+            <div class="news-meta">${new Date(n.datetime_unix * 1000).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}${n.source ? ' · ' + n.source : ''}</div>
+          </a>
+        `).join('');
+      } catch (e) { }
+    }
+
+    // ── WALLET BANNER ─────────────────────────────────────
+    function showWalletBanner() {
+      document.getElementById('wallet-banner').style.display = '';
+      document.getElementById('hero-value').textContent = 'Не подключено';
+      document.getElementById('hero-change').textContent = 'Добавьте Alpaca-счёт';
+      document.getElementById('stat-cash').textContent = '—';
+      document.getElementById('stat-bp').textContent = '—';
+      document.getElementById('stat-daypl').textContent = '—';
+      document.getElementById('positions-list').innerHTML = '';
+    }
+
+    // ── LOAD ALL ──────────────────────────────────────────
+    async function loadAll() {
+      document.getElementById('refresh-btn').textContent = '⟳ ...';
+      const ok = await loadAccount();
+      if (ok) {
+        await Promise.all([loadPositions(), loadTrades(), loadOrders()]);
+      }
+      await loadPortfolioNews();
+      document.getElementById('refresh-btn').textContent = '↻ Обновить';
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAll);
+  </script>
 </body>
+
 </html>
