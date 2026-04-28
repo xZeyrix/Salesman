@@ -1,4 +1,4 @@
-from .config import settings, prompts
+from backend.core.config import settings, prompts
 from groq import AsyncGroq
 from groq._exceptions import RateLimitError
 import asyncio

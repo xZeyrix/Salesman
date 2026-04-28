@@ -1,4 +1,4 @@
-from .config import settings
+from backend.core.config import settings
 import finnhub
 import asyncio
 from datetime import datetime

@@ -9,7 +9,7 @@ import re
 import inspect
 from pydantic import ValidationError
 from .groq_functions import PromptGuard, AiRouter, AiSalesman, ReduceHistory
-from .config import prompts
+from backend.core.config import prompts
 from .get_sales import get_symbol, get_calendar, get_company_news, get_company_profile, get_quote, get_recommendations, get_surprise
 from datetime import date, timedelta
 

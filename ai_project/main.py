@@ -4,16 +4,14 @@ from aiogram.enums import ParseMode
 from aiogram.filters import Command
 import logging
 import sys
-from .ai_system.config import settings
+from backend.core.config import settings
 import asyncio
 from .router import router
-
 dp = Dispatcher()
 
 async def main() -> None:
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     bot = Bot(token=settings.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     dp.include_router(router)
 
     await dp.start_polling(bot)
