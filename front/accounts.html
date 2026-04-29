@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Связанные счета — Salesman</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="back-header">
+    <a class="back-btn" href="profile.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <span class="back-title">Связанные счета</span>
+  </div>
+
+  <div style="padding:0 20px 16px">
+    <div style="font-size:13px;color:var(--text2);line-height:1.6">
+      Подключите брокерские счета для автоматической синхронизации портфеля и торговли прямо из приложения.
+    </div>
+  </div>
+
+  <!-- Connected -->
+  <div style="padding:0 20px;margin-bottom:6px">
+    <div style="font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Подключено</div>
+  </div>
+
+  <div style="background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="account-item">
+      <div class="account-logo" style="background:#0e1e2e;color:#4ab8e8;font-size:14px;font-weight:700">TD</div>
+      <div>
+        <div class="account-name">TD Ameritrade</div>
+        <div class="account-sub">Синхронизирован · $7 866</div>
+      </div>
+      <div class="account-right">
+        <button class="toggle on" id="acc1"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Not connected -->
+  <div style="padding:0 20px;margin-top:24px;margin-bottom:6px">
+    <div style="font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Доступные брокеры</div>
+  </div>
+
+  <div style="background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+
+    <div class="account-item">
+      <div class="account-logo" style="background:#1a0e0e;color:#e85c5c;font-size:14px">R</div>
+      <div>
+        <div class="account-name">Robinhood</div>
+        <div class="account-sub">Комиссия 0% · Акции, ETF</div>
+      </div>
+      <div class="account-right">
+        <button class="toggle" id="acc2"></button>
+      </div>
+    </div>
+
+    <div class="account-item">
+      <div class="account-logo" style="background:#0e1a10;color:#4ec994;font-size:14px">E</div>
+      <div>
+        <div class="account-name">E*TRADE</div>
+        <div class="account-sub">Полный функционал · Опционы</div>
+      </div>
+      <div class="account-right">
+        <button class="toggle" id="acc3"></button>
+      </div>
+    </div>
+
+    <div class="account-item">
+      <div class="account-logo" style="background:#1a1a0e;color:#e8c84a;font-size:14px">F</div>
+      <div>
+        <div class="account-name">Fidelity</div>
+        <div class="account-sub">Исследования · Пенсионные</div>
+      </div>
+      <div class="account-right">
+        <button class="toggle" id="acc4"></button>
+      </div>
+    </div>
+
+    <div class="account-item">
+      <div class="account-logo" style="background:#10101a;color:#8070e8;font-size:14px">IB</div>
+      <div>
+        <div class="account-name">Interactive Brokers</div>
+        <div class="account-sub">Глобальные рынки · Маржа</div>
+      </div>
+      <div class="account-right">
+        <button class="toggle" id="acc5"></button>
+      </div>
+    </div>
+
+    <div class="account-item">
+      <div class="account-logo" style="background:#1a100e;color:#e8824a;font-size:14px">C</div>
+      <div>
+        <div class="account-name">Charles Schwab</div>
+        <div class="account-sub">ETF · Облигации · Фонды</div>
+      </div>
+      <div class="account-right">
+        <button class="toggle" id="acc6"></button>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="padding:20px">
+    <button class="btn-full btn-secondary" style="font-size:13px">
+      + Добавить другой брокер
+    </button>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

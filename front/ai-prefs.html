@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ИИ-предпочтения — Salesman</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="back-header">
+    <a class="back-btn" href="profile.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <span class="back-title">ИИ-предпочтения</span>
+  </div>
+
+  <div style="padding:0 20px 20px">
+    <div style="font-size:13px;color:var(--text2);line-height:1.6">
+      Выберите инвестиционную стратегию. ИИ-аналитик будет подстраивать рекомендации, комментарии и оценку рисков под выбранный стиль.
+    </div>
+  </div>
+
+  <!-- Strategy 1 -->
+  <div class="strategy-card selected" onclick="selectStrategy(this)">
+    <div class="strategy-top">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Стратегия 1</div>
+        <div class="strategy-name">🛡 Минимальный риск</div>
+      </div>
+      <div class="strategy-badge">
+        <svg class="strategy-check" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+    <div class="strategy-desc">
+      ИИ рекомендует только стабильные «голубые фишки» с низкой волатильностью. Акцент на дивидендные акции, ETF и защитные секторы. Подходит для долгосрочного сохранения капитала.
+    </div>
+    <div class="strategy-tags">
+      <span class="strategy-tag">Низкая волатильность</span>
+      <span class="strategy-tag">Дивиденды</span>
+      <span class="strategy-tag">ETF</span>
+      <span class="strategy-tag">Защитные активы</span>
+    </div>
+  </div>
+
+  <!-- Strategy 2 -->
+  <div class="strategy-card" onclick="selectStrategy(this)">
+    <div class="strategy-top">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Стратегия 2</div>
+        <div class="strategy-name">⚖️ Оптимальная</div>
+      </div>
+      <div class="strategy-badge">
+        <svg class="strategy-check" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+    <div class="strategy-desc">
+      Сбалансированный подход: сочетание роста и стабильности. ИИ включает как надёжные компании, так и перспективные акции роста. Оптимально для большинства инвесторов.
+    </div>
+    <div class="strategy-tags">
+      <span class="strategy-tag">Баланс риска</span>
+      <span class="strategy-tag">Диверсификация</span>
+      <span class="strategy-tag">Рост + стабильность</span>
+    </div>
+  </div>
+
+  <!-- Strategy 3 -->
+  <div class="strategy-card" onclick="selectStrategy(this)">
+    <div class="strategy-top">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Стратегия 3</div>
+        <div class="strategy-name">🚀 Высокий риск</div>
+      </div>
+      <div class="strategy-badge">
+        <svg class="strategy-check" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+    <div class="strategy-desc">
+      Агрессивный рост: ИИ фокусируется на компаниях с высоким потенциалом — стартапы, IPO, новые технологии. Высокая потенциальная доходность с повышенным риском потерь.
+    </div>
+    <div class="strategy-tags">
+      <span class="strategy-tag">Высокий потенциал</span>
+      <span class="strategy-tag">IPO</span>
+      <span class="strategy-tag">Агрессивный рост</span>
+      <span class="strategy-tag">Стартапы</span>
+    </div>
+  </div>
+
+  <!-- Additional AI settings -->
+  <div style="padding:0 20px;margin-top:8px;margin-bottom:20px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:14px">Дополнительно</div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:500">Персональные советы</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">На основе вашего портфеля</div>
+        </div>
+        <button class="toggle on"></button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:500">Учёт новостей</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">ИИ читает свежие новости</div>
+        </div>
+        <button class="toggle on"></button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+        <div>
+          <div style="font-size:13px;font-weight:500">Предупреждения о рисках</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Красные флаги по акциям</div>
+        </div>
+        <button class="toggle on"></button>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:0 20px 20px">
+    <button class="btn-full btn-primary" onclick="window.location.href='profile.html'">Сохранить</button>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    function selectStrategy(card) {
+      document.querySelectorAll('.strategy-card').forEach(function(c){ c.classList.remove('selected'); });
+      card.classList.add('selected');
+    }
+  </script>
+</body>
+</html>

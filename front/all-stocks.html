@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Все акции — Salesman</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Акции</div>
+      <div class="page-subtitle">Все торгуемые бумаги</div>
+    </div>
+    <div class="badge badge-green">Открыт</div>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterStocks('all',this)">Все</button>
+    <button class="filter-tab" onclick="filterStocks('up',this)">↑ Растут</button>
+    <button class="filter-tab" onclick="filterStocks('down',this)">↓ Падают</button>
+    <button class="filter-tab" onclick="filterStocks('tech',this)">Технологии</button>
+    <button class="filter-tab" onclick="filterStocks('auto',this)">Авто</button>
+  </div>
+
+  <div class="section" id="stocks-list">
+
+    <a class="stock-row" href="stock-nvda.html" data-cat="tech up">
+      <div class="stock-icon" style="background:#1c1610;color:#e8824a">N</div>
+      <div><div class="stock-name">NVIDIA</div><div class="stock-full">NASDAQ · Полупроводники</div></div>
+      <div class="stock-right"><div class="stock-price">$875.30</div><div class="stock-change up">+3.8%</div></div>
+    </a>
+
+    <a class="stock-row" href="stock-meta.html" data-cat="tech up">
+      <div class="stock-icon" style="background:#1c1018;color:#d070e8">M</div>
+      <div><div class="stock-name">Meta</div><div class="stock-full">NASDAQ · Соцсети</div></div>
+      <div class="stock-right"><div class="stock-price">$498.70</div><div class="stock-change up">+2.1%</div></div>
+    </a>
+
+    <a class="stock-row" href="stock-googl.html" data-cat="tech up">
+      <div class="stock-icon" style="background:#101c10;color:#4ec994">G</div>
+      <div><div class="stock-name">Alphabet</div><div class="stock-full">NASDAQ · Реклама / Облако</div></div>
+      <div class="stock-right"><div class="stock-price">$168.20</div><div class="stock-change up">+1.5%</div></div>
+    </a>
+
+    <a class="stock-row" href="stock-aapl.html" data-cat="tech up">
+      <div class="stock-icon" style="background:#1c1610;color:#e8c84a">A</div>
+      <div><div class="stock-name">Apple</div><div class="stock-full">NASDAQ · Технологии</div></div>
+      <div class="stock-right"><div class="stock-price">$189.42</div><div class="stock-change up">+1.2%</div></div>
+    </a>
+
+    <a class="stock-row" href="stock-msft.html" data-cat="tech up">
+      <div class="stock-icon" style="background:#101c10;color:#4ec994">M</div>
+      <div><div class="stock-name">Microsoft</div><div class="stock-full">NASDAQ · Технологии</div></div>
+      <div class="stock-right"><div class="stock-price">$412.60</div><div class="stock-change up">+0.9%</div></div>
+    </a>
+
+    <a class="stock-row" href="stock-tsla.html" data-cat="auto down">
+      <div class="stock-icon" style="background:#1c1010;color:#e85c5c">T</div>
+      <div><div class="stock-name">Tesla</div><div class="stock-full">NASDAQ · Электромобили</div></div>
+      <div class="stock-right"><div class="stock-price">$248.10</div><div class="stock-change down">−2.4%</div></div>
+    </a>
+
+    <a class="stock-row" href="#" data-cat="tech down">
+      <div class="stock-icon" style="background:#1c1010;color:#e85c5c">I</div>
+      <div><div class="stock-name">Intel</div><div class="stock-full">NASDAQ · Полупроводники</div></div>
+      <div class="stock-right"><div class="stock-price">$32.80</div><div class="stock-change down">−1.8%</div></div>
+    </a>
+
+    <a class="stock-row" href="#" data-cat="tech up">
+      <div class="stock-icon" style="background:#10181c;color:#4ab8e8">A</div>
+      <div><div class="stock-name">AMD</div><div class="stock-full">NASDAQ · Полупроводники</div></div>
+      <div class="stock-right"><div class="stock-price">$182.40</div><div class="stock-change up">+2.3%</div></div>
+    </a>
+
+    <a class="stock-row" href="#" data-cat="tech up">
+      <div class="stock-icon" style="background:#18101c;color:#a04ae8">N</div>
+      <div><div class="stock-name">Netflix</div><div class="stock-full">NASDAQ · Стриминг</div></div>
+      <div class="stock-right"><div class="stock-price">$624.00</div><div class="stock-change up">+0.6%</div></div>
+    </a>
+
+    <a class="stock-row" href="#" data-cat="auto down">
+      <div class="stock-icon" style="background:#181018;color:#e85c5c">R</div>
+      <div><div class="stock-name">Rivian</div><div class="stock-full">NASDAQ · Электромобили</div></div>
+      <div class="stock-right"><div class="stock-price">$12.40</div><div class="stock-change down">−3.1%</div></div>
+    </a>
+
+  </div>
+
+  <nav class="nav">
+    <a class="nav-item" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Главная
+    </a>
+    <a class="nav-item" href="portfolio.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      Портфель
+    </a>
+    <a class="nav-item" href="ai.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      ИИ
+    </a>
+    <a class="nav-item" href="profile.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Профиль
+    </a>
+  </nav>
+
+  <script src="main.js"></script>
+  <script>
+    function filterStocks(filter, btn) {
+      document.querySelectorAll('.filter-tab').forEach(function(t){ t.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('#stocks-list .stock-row').forEach(function(row) {
+        var cat = row.getAttribute('data-cat') || '';
+        if (filter === 'all') {
+          row.style.display = '';
+        } else {
+          row.style.display = cat.indexOf(filter) !== -1 ? '' : 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
